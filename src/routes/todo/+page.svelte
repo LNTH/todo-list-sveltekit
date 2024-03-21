@@ -28,11 +28,7 @@
     const addTodo = async () => {
         if (newTodo !== "") {
 
-            let todoOrder = getLargestTodoOrder()
-            // if largest order = 0 (no todo)
-            // todoOrder = 0 (1st item)
-            // else todoOrder += 1
-            todoOrder = todoOrder === 0 ? 0 : todoOrder + 1
+            let todoOrder = getLargestTodoOrder() + 1
 
             const todo = {
                 id: generateUniqueId(),

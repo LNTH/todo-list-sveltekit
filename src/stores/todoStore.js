@@ -39,7 +39,7 @@ export async function addTodoStore(todo) {
 
 export async function completeTodoStore(todoId) {
     try {
-        
+
         let todo = await getTodoByIdDB(todoId)
         
         if (!todo) {
@@ -65,12 +65,5 @@ export async function completeTodoStore(todoId) {
 
 export function getLargestTodoOrder() {
     const todos = get(todosStore)
-    console.log(todos);
-    if (todos.length === 0) {
-        return 0
-    }
-
-    const largestOrder = Math.max(...todos.map(todo => todo.order))
-
-    return largestOrder
+    return todos.length - 1
 }
