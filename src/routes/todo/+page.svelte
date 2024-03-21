@@ -19,9 +19,9 @@
 
     // this one to run after each time date picker value changed
     $: if (selectedDate) {
-        async () => {
-            await getTodosByDueDateStore(selectedDate)
-        };
+        (async () => {
+            await getTodosByDueDateStore(selectedDate);
+        })();
     }
 
     let newTodo = "";
