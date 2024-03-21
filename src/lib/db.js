@@ -33,8 +33,5 @@ function openDB() {
     })
 }
 
-// Open DB once and reuse the db in task_service.js
-// since this app use db alot
-// otherwise export openDB
 
 export {openDB, STORE_NAME, TASK_SCHEMA}

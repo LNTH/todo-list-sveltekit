@@ -1,76 +1,75 @@
 <script>
-    import { generateUniqueId, getToday } from "$lib/utils";
-    import { getTodoByDueDateDB, addTodoDB, completeTodoDB } from "$lib/task_service";
-    import { openDB } from "$lib/db";
     import { onMount } from "svelte";
+    import { getTodayDateEvent } from "./event";
+    import {
+        todosStore,
+        getTodosByDueDateStore,
+        addTodoStore,
+        completeTodoStore,
+        getLargestTodoOrder
+    } from "../../stores/todoStore";
+    import { generateUniqueId, getTodayDate } from "$lib/utils";
 
-    let db;
-    let todos = [];
+    // onMount to run on 1st time open page
+    let selectedDate = "";
     onMount(async () => {
-        db = await openDB();
-        todos = await getTodoByDueDateDB(db, seletedDay);
+        selectedDate = getTodayDate()
+        await getTodosByDueDateStore(selectedDate)
     });
-    $: numTodos = todos.filter((todo) => todo.completed === false).length;
+
+    // this one to run after each time date picker value changed
+    $: if (selectedDate) {
+        async () => {
+            await getTodosByDueDateStore(selectedDate)
+        };
+    }
 
     let newTodo = "";
     const addTodo = async () => {
         if (newTodo !== "") {
+
+            let todoOrder = getLargestTodoOrder()
+            // if largest order = 0 (no todo)
+            // todoOrder = 0 (1st item)
+            // else todoOrder += 1
+            todoOrder = todoOrder === 0 ? 0 : todoOrder + 1
+
             const todo = {
                 id: generateUniqueId(),
-                order: 0,
+                order: todoOrder,
                 name: newTodo,
                 content: "",
-                dueDate: seletedDay,
+                dueDate: selectedDate,
                 completed: false,
             };
-            await addTodoDB(db, todo);
-            todos = [...todos, todo];     
-            console.log(todos);
-            newTodo = "";
+
+            await addTodoStore(todo)
+            newTodo = ""
         }
     };
 
-    let seletedDay = getToday();
-    $: if (seletedDay) {
-        console.log(seletedDay);
+    const completeTodo = async (todoId) => {
+        await completeTodoStore(todoId)
     }
 
-    const completeTodo = async (event, todoId) => {
-        console.log(todoId)
-        console.log(event.target)
-        await completeTodoDB(db, todoId)
-        todos = await getTodoByDueDateDB(db, seletedDay);
+    // $: numTodos = todos.filter((todo) => todo.completed === false).length;
 
-    }
-
-    let currentDragItemIdx;
-    const handleDragStart = (event, index) => {
-        currentDragItemIdx = index;
-        console.log("drag index", currentDragItemIdx);
-    };
-
-    let currentDropTargetIndex;
-    function handleDragOver(event, index) {
-        event.preventDefault();
-        console.log("drag to index", index);
-        currentDropTargetIndex = index;
-    }
 </script>
 
 <div class="todo flex flex-col">
     <div
         class="flex flex-col md:flex-row w-full border-stone-600 border-b-2 rounded-t-md bg-white justify-center md:items-center"
     >
-        <form
-            class="md:basis-3/5 lg:basis-4/5"
-            on:submit|preventDefault={addTodo}
-        >
-            <input
-                placeholder="What needs to be done?"
-                class="rounded-t-md w-full py-4 pl-4 md:pl-14 lg:pl-24 text-lg md:text-2xl lg:text-4xl outline-none"
-                maxlength="60"
-                bind:value={newTodo}
-            />
+    <form 
+        class="md:basis-3/5 lg:basis-4/5"
+        on:submit|preventDefault={addTodo}
+    >
+        <input
+            placeholder="What needs to be done?"
+            class="rounded-t-md w-full py-4 pl-4 md:pl-14 lg:pl-24 text-lg md:text-2xl lg:text-4xl outline-none"
+            maxlength="60"
+            bind:value={newTodo}
+        />
             <button class="hidden"></button>
         </form>
         <div class="md:basis-2/5 lg:basis-1/5 flex justify-end">
@@ -78,7 +77,8 @@
                 type="date"
                 id="date-picker"
                 class="text-md md:text-2xl lg:text-4xl md:py-4 outline-none pl-4 pr-8 text-neutral-500"
-                bind:value={seletedDay}
+                use:getTodayDateEvent
+                bind:value={selectedDate}
             />
         </div>
     </div>
@@ -89,14 +89,12 @@
         >
             <!-- {numTodos} remaining -->
         </div>
-        {#each todos as { id, name, completed }, index}
+        {#each $todosStore as { id, name, completed }, index}
             <!-- svelte-ignore a11y-no-static-element-interactions -->
 
             <div
                 class="w-full flex flex-row items-center p-4 text-md md:text-2xl drop-zone"
                 draggable="true"
-                on:dragstart={(event) => handleDragStart(event, index)}
-                on:dragover={(event) => handleDragOver(event, index)}
             >
                 <div class="basis-1/12 flex items-center justify-center">
                     <input
@@ -104,8 +102,7 @@
                         id="todo-done-chkb"
                         class="checkbox"
                         checked={completed}
-                        on:click|preventDefault={(event) => completeTodo(event, id)}
-
+                        on:click|preventDefault={completeTodo(id)}
                     />
                 </div>
                 <div
