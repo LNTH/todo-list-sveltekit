@@ -13,7 +13,9 @@
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "autoprefixer": "^10.4.18",
     "daisyui": "latest",
+    "dotenv": "^16.4.5",
     "postcss": "^8.4.35",
+    "postgres": "^3.4.4",
     "svelte": "^4.2.7",
     "tailwindcss": "^3.4.1",
     "vite": "^5.0.3"
