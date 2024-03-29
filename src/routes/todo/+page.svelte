@@ -7,7 +7,7 @@
         addTodoStore,
         completeTodoStore,
         getLargestTodoOrder
-    } from "../../stores/todoStore";
+    } from "$lib/stores/todoStore";
     import { generateUniqueId, getTodayDate } from "$lib/utils";
 
     // onMount to run on 1st time open page
