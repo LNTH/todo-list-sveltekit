@@ -1,13 +1,14 @@
 import sql from '$lib/superbase'; 
 
 export async function findUserByEmail(email) {
-    console.log("repo layer", email)
     try {
-        const user = await sql`SELECT * FROM public.user WHERE email = ${email}`;
-        return user
+        const users = await sql`SELECT * FROM public.user WHERE email = ${email}`
+        if (!users || !users[0]){
+            throw Error("user rỗng")
+        }
+        return users[0]
     } catch (err) {
-        console.log(err)
-        return {email: "sai email"}
+        throw Error("can not fetch user from database")
     }
     
 }
