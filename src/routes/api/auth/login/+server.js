@@ -1,6 +1,7 @@
 import { login } from "$lib/controller/authController"
 import { json, error } from '@sveltejs/kit'
 
+// TODO: handle error here, also review throw error in layers
 export async function POST({ request }) {
     try {
         const data = await request.json();
