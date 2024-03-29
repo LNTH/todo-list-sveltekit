@@ -53,7 +53,7 @@ export async function completeTodoStore(todoId) {
             const index = currentTodos.findIndex(todo => todo.id === todoId)
             if (index >= 0) {
                 currentTodos[index] = todo
-            } else {
+            } else { // TODO: this line should never be run
                 todosStore.update(currentTodos => [...currentTodos, todo])
             }
             return currentTodos
