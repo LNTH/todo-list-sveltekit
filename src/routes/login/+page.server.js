@@ -1,5 +1,6 @@
-import { invalid, redirect } from "@sveltejs/kit";
+import { redirect } from "@sveltejs/kit";
 
+// TODO: handle error on UI
 export const actions = {
     default: async (event) => {
         const data = await event.request.formData()
